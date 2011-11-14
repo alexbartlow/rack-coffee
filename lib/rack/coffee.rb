@@ -10,7 +10,6 @@ module Rack
     attr_accessor :urls, :root
     
     def initialize(app, opts={})
-      opts = DEFAULTS.merge(opts)
       @app = app
       @urls = *opts[:urls] || '/javascripts'
       @root = opts[:root] || Dir.pwd
