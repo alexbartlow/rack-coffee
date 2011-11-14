@@ -1,30 +1,28 @@
 require 'time'
 require 'rack/file'
 require 'rack/utils'
+require 'coffee-script'
 
 module Rack
   class Coffee
     F = ::File
     
     attr_accessor :urls, :root
-    DEFAULTS = {:static => true}
     
     def initialize(app, opts={})
       opts = DEFAULTS.merge(opts)
       @app = app
       @urls = *opts[:urls] || '/javascripts'
       @root = opts[:root] || Dir.pwd
-      @server = opts[:static] ? Rack::File.new(root) : app
+      @server = app
       @cache = opts[:cache]
       @ttl = opts[:ttl] || 86400
       @join = opts[:join]
-      @command = ['coffee', '-p']
-      @command.push('--bare') if opts[:nowrap] || opts[:bare]
-      @command = @command.join(' ')
+      @bare = opts[:bare]
     end
     
     def brew(coffee)
-      IO.popen("#{@command} #{coffee}")
+      CoffeeScript.compile(File.read(coffee), :bare => @bare)
     end
 
     def not_modified
